@@ -13,58 +13,71 @@ namespace MineSweeper
     public partial class MainForm : Form
     {
         int width, height,size, bombCount;
+
+        /// <summary>
+        /// すでに開かれているセルの座標を格納（爆弾以外）
+        /// </summary>
         List<(int, int)> openedPositions = new List<(int, int)>();
         Map map;
+        Bitmap canvas;
         bool isFirstClick = true;
 
         private void pictureBox1_MouseDown(object sender, MouseEventArgs e)
         {
+            // 最初にクリックされたときにマップを作成する
             if (isFirstClick)
             {
                 isFirstClick = false;
                 map.InitializeMap(e.Y, e.X);
+                canvas = new Bitmap(width, height);
+            }
+            else
+            {
+                canvas = new Bitmap(pictureBox1.Image);
             }
 
-            Bitmap canvas = new Bitmap(width, height);
             Graphics g = Graphics.FromImage(canvas);
-            Font fnt = new Font("MS UI Gothic", 20);
 
-            OpenAvailableArea((e.Y / size) * size, (e.X / size) * size);
-            Console.WriteLine(openedPositions.Count());
-            foreach ((int, int) item in openedPositions)
+            int x = (e.X / size) * size;
+            int y = (e.Y / size) * size;
+            switch (e.Button)
             {
-                if (map[item.Item1, item.Item2].IsNumber())
-                {
-                    g.DrawString($"{map[item.Item1, item.Item2].bombCount}", fnt, Brushes.Black, item.Item2, item.Item1);
-                }else if (map[item.Item1, item.Item2].IsNone())
-                {
-                    g.DrawString($"○", fnt, Brushes.Black, item.Item2, item.Item1);
+                case MouseButtons.Right:
+                    if (!map[y, x].IsOpened)
+                    {
+                        g.FillRectangle(Brushes.Red, new Rectangle(x, y, size, size));
+                    }
+                    break;
 
-                }
+                case MouseButtons.Left:
+                    
+                    Font fnt = new Font("MS UI Gothic", 20);
+
+                    OpenAvailableArea(y, x);
+                    foreach ((int, int) item in openedPositions)
+                    {
+                        if (map[item.Item1, item.Item2].IsNumber())
+                        {
+                            g.DrawString($"{map[item.Item1, item.Item2].bombCount}", fnt, Brushes.Black, item.Item2, item.Item1);
+                        }
+                        else if (map[item.Item1, item.Item2].IsNone())
+                        {
+                            g.DrawString($"○", fnt, Brushes.Black, item.Item2, item.Item1);
+                        }
+                        map[item.Item1, item.Item2].Open();
+                    }
+                    break;
             }
 
-            /*foreach ((int, int, Cell) item in map.GetPositionCellPair())
-            {
-                if (item.Item3.IsBomb())
-                {
-                    g.DrawString($"X", fnt, Brushes.Red, item.Item2, item.Item1);
-                }
-                else if (item.Item3.IsNumber())
-                {
-                    g.DrawString($"{item.Item3.bombCount}", fnt, Brushes.Black, item.Item2, item.Item1);
-                }
-            }*/
             g.Dispose();
             pictureBox1.Image = canvas;
-
             DrawCell();
-            //FillCell(e.X, e.Y);
         }
 
         private void OpenAvailableArea(int j, int i) {
             
             // 表示するセルをリストに登録して、表示はあとから一括する
-            if (!map[j, i].IsBomb())
+            if (!map[j, i].IsBomb() && !map[j, i].IsOpened)
             {
                 if (!openedPositions.Contains((j, i)))
                 {

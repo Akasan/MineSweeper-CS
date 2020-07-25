@@ -60,9 +60,9 @@ namespace MineSweeper
 
         public void SetBombNumber(int bombCount)
         {
-            this.bombCount = bombCount;
             if(bombCount > 0)
             {
+                this.bombCount = bombCount;
                 ToNumber();
             }
         }

@@ -20,7 +20,6 @@ namespace MineSweeper
         private int size;
         private Random indexRandomizer = new System.Random();
         public int BombNum;
-        
 
         public Map(int pictureBoWidth, int pictureBoHeight, int size, int bombNum)
         {
@@ -31,11 +30,11 @@ namespace MineSweeper
             this.size = size;
             this.BombNum = bombNum;
             bombPosition = new List<(int, int)>();
-            map = new Cell[pictureBoHeight / size, pictureBoWidth / size];
 
-            for(int i=0; i< pictureBoHeight / size; i++)
+            map = new Cell[pictureBoHeight / size, pictureBoWidth / size];
+            for (int i = 0; i < pictureBoHeight / size; i++)
             {
-                for(int j=0; j< pictureBoWidth / size; j++)
+                for (int j = 0; j < pictureBoWidth / size; j++)
                 {
                     map[i, j] = new Cell();
                 }
